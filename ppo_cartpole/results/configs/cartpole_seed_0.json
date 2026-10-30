@@ -1,0 +1,18 @@
+{
+  "env_id": "CartPole-v1",
+  "seed": 0,
+  "steps": 50000,
+  "n_steps": 2048,
+  "batch_size": 64,
+  "n_epochs": 10,
+  "lr": 0.0003,
+  "gamma": 0.99,
+  "gae_lambda": 0.95,
+  "clip_range": 0.2,
+  "eval_freq": 5000,
+  "eval_episodes": 10,
+  "eval_seed": 12345,
+  "device": "cpu",
+  "gymnasium": "1.4.0",
+  "torch": "2.14.1+cpu"
+}

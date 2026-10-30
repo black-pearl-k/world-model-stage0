@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+Thumbs.db
+.DS_Store
+
+# MuJoCo warning log
+MUJOCO_LOG.TXT
+
+# Large experiment artifacts (subproject .gitignore also covers these)
+**/logs/
+**/models/
+**/checkpoints/
+**/*.zip
+**/*.pt
+**/*.pth
+**/*.onnx
+**/*.ckpt
+**/videos/*.mp4
+**/videos/*.avi
+**/videos/*.mov
+**/wandb/
+**/runs/
+**/tb/

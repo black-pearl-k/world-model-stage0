@@ -1,0 +1,9 @@
+# Stage 0 environment (CPU PyTorch)
+# Installed in conda env: RL
+gymnasium[mujoco]==1.4.0
+stable-baselines3[extra]==2.9.2
+torch>=2.8
+tensorboard==2.21.0
+matplotlib==3.10.9
+imageio==2.38.0
+imageio-ffmpeg==0.6.0
