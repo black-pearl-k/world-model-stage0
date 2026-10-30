@@ -186,5 +186,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    print("just start")
     main()
