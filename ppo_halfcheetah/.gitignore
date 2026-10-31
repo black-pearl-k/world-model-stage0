@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+Thumbs.db
+.DS_Store
+
+# RL artifacts
+logs/
+models/
+checkpoints/
+videos/*.mp4
+videos/*.avi
+videos/*.mov
+*.zip
+*.pt
+*.pth
+*.onnx
+*.ckpt
+MUJOCO_LOG.TXT
+wandb/
+runs/
+tb/
