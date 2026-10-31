@@ -32,6 +32,7 @@ ppo_halfcheetah/
 ├── train.py                       # PPO 训练函数，也可单独运行
 ├── run_halfcheetah_smoke.py       # 2 万步 smoke test
 ├── run_halfcheetah_3seeds.py      # 一键训练 3 个 seed
+├── watch_halfcheetah.py           # 实时打开 MuJoCo 窗口观看模型
 ├── eval.py                        # 评测函数，不做训练
 ├── run_eval_halfcheetah.py        # 评测 3 个模型并生成结果表、视频
 ├── plot_halfcheetah_curves.py     # 画 3 个 seed 的评测曲线
@@ -192,6 +193,30 @@ results/halfcheetah_curves.png
 ```
 
 曲线来自训练中 `EvalCallback` 的 `evaluations.npz`，不是最终评测。
+
+## 实时观看模型
+
+右键：
+
+```text
+watch_halfcheetah.py → Run
+```
+
+它会打开一个 MuJoCo 实时窗口，加载模型跑 3 局。
+
+默认优先加载：
+
+```text
+logs/halfcheetah/seed_0/final_model.zip
+```
+
+如果这个模型还不存在，会自动使用 smoke test 的模型：
+
+```text
+logs/halfcheetah/smoke_seed_0/final_model.zip
+```
+
+注意：正式训练 3 个 seed 时不要开实时窗口，渲染会拖慢训练。实时观看只用于检查模型和演示。
 
 ## 训练超参
 
