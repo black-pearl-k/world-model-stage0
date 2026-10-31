@@ -7,7 +7,7 @@
 | 实验 | 环境 | 状态 |
 |---|---|---|
 | `ppo_cartpole/` | CartPole-v1 | 已完成：3 个 seed，500 ± 0 |
-| `ppo_halfcheetah/` | HalfCheetah-v5 | 脚本已就绪，待训练 |
+| `ppo_halfcheetah/` | HalfCheetah-v5 | 已完成 300K 3 seeds；1M seed 0 实验脚本已就绪 |
 
 ## 当前结果
 
@@ -23,6 +23,17 @@ mean ± std: 500.0 ± 0.0
 这是封顶效应：CartPole 最高只能到 500，所以它更像一个 smoke test，而不是敏感的基准任务。
 
 运行命令、结果、评测协议和注意事项见 [`ppo_cartpole/README.md`](ppo_cartpole/README.md)。
+
+HalfCheetah-v5，PPO，3 个 seed，每个 seed 训练 30 万步，最终评测 10 局：
+
+```text
+seed_0: 976.48
+seed_1: 1228.87
+seed_2: 879.20
+mean ± std: 1028.18 ± 180.48
+```
+
+HalfCheetah 的 300K 结果和“倒着滑”的奖励漏洞分析见 [`ppo_halfcheetah/README.md`](ppo_halfcheetah/README.md)。1M seed 0 实验运行 `ppo_halfcheetah/run_halfcheetah_1m.py`。
 
 ## 环境
 

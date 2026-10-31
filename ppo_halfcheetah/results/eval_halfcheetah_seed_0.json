@@ -1,0 +1,33 @@
+{
+  "env": "HalfCheetah-v5",
+  "model": "D:\\world_model\\stage_0\\ppo_halfcheetah\\logs\\halfcheetah\\seed_0\\final_model.zip",
+  "episodes": [
+    786.998202598128,
+    1030.0614749457131,
+    980.3676664606743,
+    994.447920599239,
+    973.4741645859348,
+    964.8576078993294,
+    967.1216751013366,
+    1024.852554208683,
+    980.8190075928035,
+    1061.7972494965175
+  ],
+  "lengths": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ],
+  "mean": 976.479752348836,
+  "std": 73.77273168572016,
+  "video": "D:\\world_model\\stage_0\\ppo_halfcheetah\\videos\\halfcheetah_seed_0.mp4",
+  "screenshot": "D:\\world_model\\stage_0\\ppo_halfcheetah\\videos\\halfcheetah_seed_0.png",
+  "train_seed": 0
+}
