@@ -40,6 +40,7 @@ ppo_halfcheetah/
 ├── run_halfcheetah_faster.py      # 从 0.8 m/s 模型继续，把目标提高到 1.5 m/s
 ├── run_halfcheetah_native.py      # 从 1.5 m/s 模型继续，目标提高到原生约 1.95 m/s
 ├── run_halfcheetah_final.py       # 最终速度阶段，目标提高到 2.0 m/s
+├── run_halfcheetah_final_3seeds.py # 补跑最终 2.0 m/s 的 seed 1/2
 ├── plot_halfcheetah_gait_curves.py # 画步态奖励实验曲线
 ├── plot_halfcheetah_stand_curves.py # 画站立实验的奖励和姿态指标
 ├── watch_halfcheetah.py           # 实时打开 MuJoCo 窗口观看模型
@@ -868,6 +869,33 @@ watch_halfcheetah.py → Run
 logs/halfcheetah_final/seed_0/final_model.zip
 ```
 
+### 13. 补跑最终 2.0 m/s 的 seed 1 和 seed 2
+
+seed 0 已经训练过，剩下两个 seed 用：
+
+```text
+run_halfcheetah_final_3seeds.py → Run
+```
+
+输出：
+
+```text
+logs/halfcheetah_final/seed_1/
+logs/halfcheetah_final/seed_2/
+results/halfcheetah_final_seed_1.json
+results/halfcheetah_final_seed_1_snapshots.csv
+results/halfcheetah_final_seed_2.json
+results/halfcheetah_final_seed_2_snapshots.csv
+```
+
+注意：当前只有 seed 0 有完整的 1.95 m/s 前一阶段模型，因此 seed 1/2 都从：
+
+```text
+logs/halfcheetah_native/seed_0/final_model.zip
+```
+
+继续训练。训练采样和动作噪声分别使用 seed 1 / seed 2，但初始化模型是共享的，不是完全独立的三个 seed。
+
 ## 实时观看模型
 
 右键：
@@ -953,10 +981,11 @@ models/
 1.95 m/s 实验的 best_model.zip
 1.95 m/s 实验的 snapshots
 1.95 m/s 实验的 checkpoints
-最终 2.0 m/s 实验的 final_model.zip
-最终 2.0 m/s 实验的 best_model.zip
-最终 2.0 m/s 实验的 snapshots
-最终 2.0 m/s 实验的 checkpoints
+最终 2.0 m/s seed 0 的 final_model.zip
+最终 2.0 m/s seed 0 的 best_model.zip
+最终 2.0 m/s seed 0 的 snapshots
+最终 2.0 m/s seed 0 的 checkpoints
+最终 2.0 m/s seed 1/2 的模型
 smoke test 模型
 ```
 
