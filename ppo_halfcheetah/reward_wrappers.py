@@ -331,3 +331,92 @@ class StandRewardWrapper(GaitRewardWrapper):
         info["target_z"] = float(self.target_z)
 
         return obs, float(stand_reward), terminated, truncated, info
+
+
+class TargetSpeedRewardWrapper(StandRewardWrapper):
+    """站立奖励 + 一个很小的目标速度。
+
+    这个类用于第二阶段，不是高速跑步阶段。
+
+    速度项由两部分组成：
+
+        speed_error = max(0, |v - target_speed| - speed_tolerance)
+        target_score = max(0, 1 - |v - target_speed| / target_speed)
+
+        speed_reward =
+            + w_speed_target * target_score
+            - w_speed_error * speed_error
+
+    例如 target_speed=0.3、tolerance=0.1：
+
+        速度 0.2–0.4 m/s：误差惩罚为 0，target_score 接近 1
+        速度为 0：target_score=0，并扣约 0.2 * w_speed_error
+        速度为 0.8：target_score=0，并扣约 0.4 * w_speed_error
+
+    另外有一个姿态门控：只有身体基本水平、没有头/躯干碰地时，
+    速度奖励才生效，防止模型靠翻倒或用头滑行来换速度。
+    原始 HalfCheetah 前进奖励仍然固定为 0。
+    """
+
+    def __init__(
+        self,
+        env: gym.Env,
+        target_speed: float = 0.3,
+        speed_tolerance: float = 0.1,
+        w_speed_error: float = 1.5,
+        w_speed_target: float = 2.0,
+        **kwargs: Any,
+    ) -> None:
+        # 第二阶段不再使用站立阶段的 x_velocity 平方惩罚，
+        # 否则会和“达到目标速度”互相打架。
+        kwargs.setdefault("w_x_velocity", 0.0)
+        super().__init__(env, **kwargs)
+        self.target_speed = float(target_speed)
+        self.speed_tolerance = float(speed_tolerance)
+        self.w_speed_error = float(w_speed_error)
+        self.w_speed_target = float(w_speed_target)
+
+    def step(
+        self,
+        action: Any,
+    ) -> tuple[Any, float, bool, bool, dict[str, Any]]:
+        """在站立奖励上加入目标速度奖励和误差惩罚。"""
+        obs, stand_reward, terminated, truncated, info = super().step(action)
+
+        x_velocity = float(info["x_velocity"])
+        speed_error = max(
+            0.0,
+            abs(x_velocity - self.target_speed) - self.speed_tolerance,
+        )
+
+        # 离目标越近，target_score 越接近 1；超过目标速度两倍时变 0。
+        # 同时保留 speed_error 惩罚，形成“接近目标得分、偏离目标扣分”。
+        target_score = max(
+            0.0,
+            1.0 - abs(x_velocity - self.target_speed) / max(self.target_speed, 1e-6),
+        )
+        speed_reward = (
+            self.w_speed_target * target_score
+            - self.w_speed_error * speed_error
+        )
+
+        # 关键门控：只有身体基本水平且没有头/躯干碰地时，
+        # 速度奖励才有效。这样它不能靠翻倒/用头滑来换速度。
+        posture_ok = (
+            float(info["upright"]) >= 0.8
+            and float(info["body_contact"]) == 0.0
+        )
+        if not posture_ok:
+            speed_reward = 0.0
+
+        total_reward = stand_reward + speed_reward
+
+        info["target_speed"] = float(self.target_speed)
+        info["speed_tolerance"] = float(self.speed_tolerance)
+        info["speed_error"] = float(speed_error)
+        info["speed_target_score"] = float(target_score)
+        info["speed_gate"] = 1.0 if posture_ok else 0.0
+        info["reward_speed"] = float(speed_reward)
+        info["reward_shaped"] = float(total_reward)
+
+        return obs, float(total_reward), terminated, truncated, info

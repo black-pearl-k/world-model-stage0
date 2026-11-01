@@ -35,6 +35,7 @@ ppo_halfcheetah/
 ├── reward_wrappers.py             # 奖励塑形：步态版 + 只站立版
 ├── run_halfcheetah_gait.py        # seed 0 步态奖励训练，保存过程视频和步态统计
 ├── run_halfcheetah_stand.py       # seed 0 只站立训练，先去掉前进奖励
+├── run_halfcheetah_speed.py       # 从站立模型继续，加一个很小的目标速度
 ├── plot_halfcheetah_gait_curves.py # 画步态奖励实验曲线
 ├── plot_halfcheetah_stand_curves.py # 画站立实验的奖励和姿态指标
 ├── watch_halfcheetah.py           # 实时打开 MuJoCo 窗口观看模型
@@ -468,6 +469,134 @@ run_tensorboard_stand.py → Run
 http://localhost:6010
 ```
 
+### 8. 加一个很小的目标速度
+
+站住之后，下一步不是把原始奖励加回来，而是在站立奖励上只加一个很小的目标速度。
+
+右键：
+
+```text
+run_halfcheetah_speed.py → Run
+```
+
+它会从站立模型继续：
+
+```text
+logs/halfcheetah_stand/seed_0/final_model.zip
+```
+
+默认目标速度：
+
+```text
+0.3 m/s
+```
+
+这不是跑步速度，只是让模型开始慢慢往前。
+
+输出：
+
+```text
+logs/halfcheetah_speed/seed_0/
+videos/halfcheetah_speed/
+results/halfcheetah_speed_seed_0_snapshots.csv
+results/halfcheetah_speed_seed_0.json
+```
+
+奖励仍然是：
+
+```text
+不使用原始 HalfCheetah 前进奖励
+```
+
+速度项：
+
+```text
+speed_error = max(0, |v - 0.3| - 0.1)
+target_score = max(0, 1 - |v - 0.3| / 0.3)
+
+speed_reward =
+    + 2.0 * target_score
+    - 4.0 * speed_error
+```
+
+含义：
+
+```text
+0.2–0.4 m/s：算接近目标，不扣误差分
+越接近 0.3 m/s：奖励越高
+速度为 0：没有目标奖励，并且扣速度误差
+速度太快：目标奖励变低，并扣速度误差
+```
+
+另外有一个重要门控：
+
+```text
+只有身体基本水平、没有头/躯干碰地时
+速度奖励才生效
+```
+
+所以它不能靠翻倒、用头滑行来换速度。
+
+关键参数在 `run_halfcheetah_speed.py` 顶部：
+
+```python
+TARGET_SPEED = 0.3
+SPEED_TOLERANCE = 0.1
+W_SPEED_ERROR = 4.0
+W_SPEED_TARGET = 2.0
+RESET_LOG_STD = -2.5
+```
+
+`RESET_LOG_STD=-2.5` 是为了让站立模型稍微恢复一点探索能力，动作标准差从大约 `0.05` 放大到大约 `0.08`，但不会大到立刻翻车。
+
+我测试过 100K 步：
+
+```text
+mean_upright 约 0.99
+头/躯干接触 0
+mean x velocity 约 0.24 m/s
+目标速度 0.3 m/s
+```
+
+说明它已经能在保持水平的情况下慢慢往前移动，而不是站着不动。
+
+重点看 `results/halfcheetah_speed_seed_0_snapshots.csv`：
+
+```text
+mean_x_velocity
+mean_speed_error
+mean_upright
+torso_contact_rate
+head_contact_rate
+```
+
+如果它完全不动：
+
+```text
+提高 W_SPEED_TARGET
+提高 W_SPEED_ERROR
+```
+
+如果它为了速度开始翻：
+
+```text
+提高 W_HEAD_CONTACT
+提高 W_TORSO_CONTACT
+提高 W_ROOT_VELOCITY
+```
+
+如果它动作太大、抖动：
+
+```text
+提高 W_ACTION_RATE
+```
+
+训练完成后，用 `watch_halfcheetah.py` 选择：
+
+```text
+logs/halfcheetah_speed/seed_0/final_model.zip
+```
+
 ## 实时观看模型
 
 右键：
@@ -537,6 +666,10 @@ models/
 只站立实验的 best_model.zip
 只站立实验的 snapshots
 只站立实验的 checkpoints
+小目标速度实验的 final_model.zip
+小目标速度实验的 best_model.zip
+小目标速度实验的 snapshots
+小目标速度实验的 checkpoints
 smoke test 模型
 ```
 
