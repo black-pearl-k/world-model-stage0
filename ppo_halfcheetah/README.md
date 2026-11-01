@@ -32,7 +32,7 @@ ppo_halfcheetah/
 ├── train.py                       # PPO 训练函数，也可单独运行
 ├── run_halfcheetah_smoke.py       # 2 万步 smoke test
 ├── run_halfcheetah_3seeds.py      # 一键训练 3 个 seed
-├── reward_wrappers.py             # 奖励塑形：步态版 + 只站立版
+├── reward_wrappers.py             # 奖励塑形：步态版、站立版、目标速度版
 ├── run_halfcheetah_gait.py        # seed 0 步态奖励训练，保存过程视频和步态统计
 ├── run_halfcheetah_final.py       # 最终速度阶段，目标提高到 2.0 m/s
 ├── run_halfcheetah_final_3seeds.py # 补跑最终 2.0 m/s 的 seed 1/2
@@ -485,9 +485,9 @@ models/
 下面的所有 `.zip` 模型，并按修改时间从新到旧列出，例如：
 
 ```text
-[ 1] 2026-11-01 00:21  165.4 KB  logs\halfcheetah_gait\seed_0\final_model.zip
-[ 2] 2026-11-01 00:16  165.4 KB  logs\halfcheetah_gait\seed_0\best_model\best_model.zip
-[ 3] 2026-10-31 21:41  165.4 KB  logs\halfcheetah\seed_0\final_model.zip
+[ 1] 2026-11-02 00:00  165.4 KB  logs\halfcheetah_final\seed_0\final_model.zip
+[ 2] 2026-11-02 00:00  165.4 KB  logs\halfcheetah_final\seed_0\best_model\best_model.zip
+[ 3] 2026-11-01 21:30  165.4 KB  logs\halfcheetah_final\seed_2\final_model.zip
 ...
 ```
 
@@ -506,30 +506,14 @@ models/
 ```text
 300K 的 final_model.zip
 300K 的 best_model.zip
-300K 的 checkpoints
 步态奖励实验的 final_model.zip
 步态奖励实验的 best_model.zip
-步态奖励实验的 snapshots
-步态奖励实验的 checkpoints
-只站立实验的 final_model.zip
-只站立实验的 best_model.zip
-只站立实验的 snapshots
-只站立实验的 checkpoints
-小目标速度实验的 final_model.zip
-小目标速度实验的 best_model.zip
-小目标速度实验的 snapshots
-小目标速度实验的 checkpoints
-较快速度实验的 final_model.zip
-较快速度实验的 best_model.zip
-较快速度实验的 snapshots
-较快速度实验的 checkpoints
-最终 2.0 m/s seed 0 的 final_model.zip
-最终 2.0 m/s seed 0 的 best_model.zip
-最终 2.0 m/s seed 0 的 snapshots
-最终 2.0 m/s seed 0 的 checkpoints
-最终 2.0 m/s seed 1/2 的模型
+最终 2.0 m/s seed 0/1/2 的 final_model.zip
+最终 2.0 m/s seed 0/1/2 的 best_model.zip
 smoke test 模型
 ```
+
+中间训练产生的 checkpoint 和 snapshot 模型已经删除，详细过程数据（CSV、JSON、视频、曲线和评测记录）仍然保留。
 
 `best_model.zip` 是训练过程中 `EvalCallback` 按验证集平均回报选出的模型；`final_model.zip` 是训练结束时的模型。最终对比时，三个 seed 最好使用同一种选择规则，不要只挑某个 seed 的 best。
 
