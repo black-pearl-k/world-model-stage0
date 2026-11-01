@@ -1,0 +1,4 @@
+seed,final_mean,final_std,final_median,final_min,final_max,negative_episodes,snapshot_speed_mean,snapshot_x_velocity,snapshot_upright,torso_contact_rate,head_contact_rate
+0,1074.75,989.86,1684.4,-372.71,1702.25,3,1114.37,1.2276,0.8976,0.0,0.0543
+1,1508.22,491.94,1667.59,108.71,1677.38,0,2100.66,1.9149,0.9967,0.0,0.0
+2,1546.45,262.04,1668.29,974.52,1677.93,0,2022.11,1.9102,0.9969,0.0,0.0

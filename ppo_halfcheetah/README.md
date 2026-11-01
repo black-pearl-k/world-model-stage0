@@ -34,22 +34,16 @@ ppo_halfcheetah/
 ├── run_halfcheetah_3seeds.py      # 一键训练 3 个 seed
 ├── reward_wrappers.py             # 奖励塑形：步态版 + 只站立版
 ├── run_halfcheetah_gait.py        # seed 0 步态奖励训练，保存过程视频和步态统计
-├── run_halfcheetah_stand.py       # seed 0 只站立训练，先去掉前进奖励
-├── run_halfcheetah_speed.py       # 从站立模型继续，加一个很小的目标速度
-├── run_halfcheetah_fast.py        # 从 0.3 m/s 模型继续，把目标提高到 0.8 m/s
-├── run_halfcheetah_faster.py      # 从 0.8 m/s 模型继续，把目标提高到 1.5 m/s
-├── run_halfcheetah_native.py      # 从 1.5 m/s 模型继续，目标提高到原生约 1.95 m/s
 ├── run_halfcheetah_final.py       # 最终速度阶段，目标提高到 2.0 m/s
 ├── run_halfcheetah_final_3seeds.py # 补跑最终 2.0 m/s 的 seed 1/2
+├── summarize_halfcheetah_final_3seeds.py # 汇总最终 3 个 seed 并画图
 ├── plot_halfcheetah_gait_curves.py # 画步态奖励实验曲线
-├── plot_halfcheetah_stand_curves.py # 画站立实验的奖励和姿态指标
 ├── watch_halfcheetah.py           # 实时打开 MuJoCo 窗口观看模型
 ├── eval.py                        # 评测函数，不做训练
 ├── run_eval_halfcheetah.py        # 评测 3 个模型并生成结果表、视频
 ├── plot_halfcheetah_curves.py     # 画 3 个 seed 的评测曲线
 ├── run_tensorboard.py             # 在 PyCharm 内启动 300K TensorBoard
 ├── run_tensorboard_gait.py        # 在 PyCharm 内启动步态奖励 TensorBoard
-├── run_tensorboard_stand.py       # 在 PyCharm 内启动站立实验 TensorBoard
 ├── logs/                          # 训练日志、TensorBoard、evaluations.npz
 ├── models/                        # 预留
 ├── videos/                        # 评测视频/截图
@@ -321,494 +315,9 @@ http://localhost:6009
 
 先只跑 seed 0 的 300K，确认视频里不再用头/背滑行，再考虑 3 个 seed。
 
-### 7. 先练习站立（完全去掉前进奖励）
+### 7. 最终速度 2.0 m/s
 
-上一版步态奖励仍然保留了原始前进奖励，所以模型还是会为了速度往前跑，并且可能翻跟头。
-
-如果现在的目标是：
-
-```text
-先不管跑
-先让身体水平
-先让腿在下面
-先不要用头/背滑
-先不要翻滚和猛蹬
-```
-
-就运行：
-
-```text
-run_halfcheetah_stand.py → Run
-```
-
-它使用 `reward_wrappers.py` 里的新类：
-
-```python
-StandRewardWrapper
-```
-
-这个类**完全不使用原始 HalfCheetah 奖励**。  
-原始奖励只写进 `info` 做诊断，不参与训练。
-
-站立奖励：
-
-```text
-站立奖励 =
-    + 1.0 * cos(rooty)
-    - 2.0 * 躯干碰地
-    - 5.0 * 头碰地
-    - 0.5 * 高度偏离
-    - 0.5 * x_velocity^2
-    - 0.2 * 根节点速度平方
-    - 0.02 * 关节速度平方
-    - 0.05 * 动作幅度平方
-    - 0.05 * 动作变化平方
-```
-
-它和步态版的区别：
-
-```text
-步态版：原始前进奖励还在
-站立版：原始前进奖励完全去掉
-```
-
-所以站立版的模型不会为了速度跑，反而会被惩罚：
-
-```text
-x_velocity
-根节点速度
-关节速度
-动作变化
-```
-
-输出：
-
-```text
-logs/halfcheetah_stand/seed_0/
-videos/halfcheetah_stand/
-results/halfcheetah_stand_seed_0_snapshots.csv
-results/halfcheetah_stand_seed_0.json
-```
-
-默认每 50K 保存一次视频：
-
-```text
-0
-50K
-100K
-150K
-200K
-250K
-300K
-```
-
-重点看：
-
-```text
-mean_upright       是否接近 1
-mean_rooty         是否接近 0
-torso_contact_rate 是否接近 0
-head_contact_rate  是否接近 0
-mean_x_velocity    是否接近 0
-```
-
-最终 JSON 里的原始 HalfCheetah 回报会接近 0 或为负，这是正常的，因为现在根本没有奖励前进。不要拿它和 976 比较。
-
-训练完成后，运行 `watch_halfcheetah.py`，选择：
-
-```text
-logs/halfcheetah_stand/seed_0/final_model.zip
-```
-
-看它能不能稳定站住。
-
-如果站立版仍然翻倒：
-
-```text
-提高 W_HEAD_CONTACT
-提高 W_ROOT_VELOCITY
-提高 W_ACTION_RATE
-```
-
-如果它站着但一直抖：
-
-```text
-提高 W_JOINT_VELOCITY
-提高 W_ACTION
-```
-
-如果它完全不站、直接趴下：
-
-```text
-提高 W_UPRIGHT
-提高 W_HEIGHT
-```
-
-参数都在 `run_halfcheetah_stand.py` 顶部。
-
-训练完成后，右键：
-
-```text
-plot_halfcheetah_stand_curves.py → Run
-```
-
-生成：
-
-```text
-results/halfcheetah_stand_curve.png
-```
-
-图里有：
-
-```text
-站立奖励
-mean_upright
-躯干/头碰地比例
-平均 x 速度
-```
-
-站立实验的 TensorBoard：
-
-```text
-run_tensorboard_stand.py → Run
-http://localhost:6010
-```
-
-### 8. 加一个很小的目标速度
-
-站住之后，下一步不是把原始奖励加回来，而是在站立奖励上只加一个很小的目标速度。
-
-右键：
-
-```text
-run_halfcheetah_speed.py → Run
-```
-
-它会从站立模型继续：
-
-```text
-logs/halfcheetah_stand/seed_0/final_model.zip
-```
-
-默认目标速度：
-
-```text
-0.3 m/s
-```
-
-这不是跑步速度，只是让模型开始慢慢往前。
-
-输出：
-
-```text
-logs/halfcheetah_speed/seed_0/
-videos/halfcheetah_speed/
-results/halfcheetah_speed_seed_0_snapshots.csv
-results/halfcheetah_speed_seed_0.json
-```
-
-奖励仍然是：
-
-```text
-不使用原始 HalfCheetah 前进奖励
-```
-
-速度项：
-
-```text
-speed_error = max(0, |v - 0.3| - 0.1)
-target_score = max(0, 1 - |v - 0.3| / 0.3)
-
-speed_reward =
-    + 2.0 * target_score
-    - 4.0 * speed_error
-```
-
-含义：
-
-```text
-0.2–0.4 m/s：算接近目标，不扣误差分
-越接近 0.3 m/s：奖励越高
-速度为 0：没有目标奖励，并且扣速度误差
-速度太快：目标奖励变低，并扣速度误差
-```
-
-另外有一个重要门控：
-
-```text
-只有身体基本水平、没有头/躯干碰地时
-速度奖励才生效
-```
-
-所以它不能靠翻倒、用头滑行来换速度。
-
-关键参数在 `run_halfcheetah_speed.py` 顶部：
-
-```python
-TARGET_SPEED = 0.3
-SPEED_TOLERANCE = 0.1
-W_SPEED_ERROR = 4.0
-W_SPEED_TARGET = 2.0
-RESET_LOG_STD = -2.5
-```
-
-`RESET_LOG_STD=-2.5` 是为了让站立模型稍微恢复一点探索能力，动作标准差从大约 `0.05` 放大到大约 `0.08`，但不会大到立刻翻车。
-
-我测试过 100K 步：
-
-```text
-mean_upright 约 0.99
-头/躯干接触 0
-mean x velocity 约 0.24 m/s
-目标速度 0.3 m/s
-```
-
-说明它已经能在保持水平的情况下慢慢往前移动，而不是站着不动。
-
-重点看 `results/halfcheetah_speed_seed_0_snapshots.csv`：
-
-```text
-mean_x_velocity
-mean_speed_error
-mean_upright
-torso_contact_rate
-head_contact_rate
-```
-
-如果它完全不动：
-
-```text
-提高 W_SPEED_TARGET
-提高 W_SPEED_ERROR
-```
-
-如果它为了速度开始翻：
-
-```text
-提高 W_HEAD_CONTACT
-提高 W_TORSO_CONTACT
-提高 W_ROOT_VELOCITY
-```
-
-如果它动作太大、抖动：
-
-```text
-提高 W_ACTION_RATE
-```
-
-训练完成后，用 `watch_halfcheetah.py` 选择：
-
-```text
-logs/halfcheetah_speed/seed_0/final_model.zip
-```
-
-### 9. 把目标速度提高到 0.8 m/s
-
-在 0.3 m/s 模型稳定之后，再提高一点速度。
-
-右键：
-
-```text
-run_halfcheetah_fast.py → Run
-```
-
-它从：
-
-```text
-logs/halfcheetah_speed/seed_0/final_model.zip
-```
-
-继续训练，目标速度改为：
-
-```text
-0.8 m/s
-```
-
-输出：
-
-```text
-logs/halfcheetah_fast/seed_0/
-videos/halfcheetah_fast/
-results/halfcheetah_fast_seed_0_snapshots.csv
-results/halfcheetah_fast_seed_0.json
-```
-
-参数在 `run_halfcheetah_fast.py` 顶部：
-
-```python
-TARGET_SPEED = 0.8
-SPEED_TOLERANCE = 0.1
-W_SPEED_ERROR = 4.0
-W_SPEED_TARGET = 2.0
-RESET_LOG_STD = -2.3
-```
-
-它仍然是：
-
-```text
-站立奖励 + 目标速度奖励
-不使用原始 HalfCheetah 前进奖励
-身体不水平或碰地时，速度奖励关闭
-```
-
-我测试过 100K 步：
-
-```text
-mean_upright 约 0.995
-头/躯干接触 0
-mean x velocity 约 0.773 m/s
-目标速度 0.8 m/s
-```
-
-运行完成后，用 `watch_halfcheetah.py` 选择：
-
-```text
-logs/halfcheetah_fast/seed_0/final_model.zip
-```
-
-如果它为了提速开始翻倒，提高：
-
-```text
-W_HEAD_CONTACT
-W_TORSO_CONTACT
-W_ROOT_VELOCITY
-```
-
-如果它太慢，继续提高 `TARGET_SPEED`；不要一次从 0.8 跳到 1.8。
-
-### 10. 把目标速度提高到 1.5 m/s
-
-在 0.8 m/s 模型稳定之后，再提高速度。
-
-右键：
-
-```text
-run_halfcheetah_faster.py → Run
-```
-
-它从：
-
-```text
-logs/halfcheetah_fast/seed_0/final_model.zip
-```
-
-继续训练，目标速度改为：
-
-```text
-1.5 m/s
-```
-
-输出：
-
-```text
-logs/halfcheetah_faster/seed_0/
-videos/halfcheetah_faster/
-results/halfcheetah_faster_seed_0_snapshots.csv
-results/halfcheetah_faster_seed_0.json
-```
-
-参数在 `run_halfcheetah_faster.py` 顶部：
-
-```python
-TARGET_SPEED = 1.5
-SPEED_TOLERANCE = 0.15
-W_SPEED_ERROR = 4.0
-W_SPEED_TARGET = 2.0
-RESET_LOG_STD = -2.3
-```
-
-我测试过 100K 步：
-
-```text
-mean_upright 约 0.995
-头/躯干接触 0
-mean x velocity 约 1.359 m/s
-目标速度 1.5 m/s
-speed error 约 0.097
-```
-
-说明它已经能在保持水平的情况下，以大约 `1.36 m/s` 前进。
-
-训练完成后用 `watch_halfcheetah.py` 选择：
-
-```text
-logs/halfcheetah_faster/seed_0/final_model.zip
-```
-
-### 11. 提高到原生模型约 1.95 m/s
-
-最后从 1.5 m/s 模型继续，把目标速度提高到原生模型的前进速度附近。
-
-右键：
-
-```text
-run_halfcheetah_native.py → Run
-```
-
-它从：
-
-```text
-logs/halfcheetah_faster/seed_0/final_model.zip
-```
-
-继续训练，目标速度：
-
-```text
-1.95 m/s
-```
-
-输出：
-
-```text
-logs/halfcheetah_native/seed_0/
-videos/halfcheetah_native/
-results/halfcheetah_native_seed_0_snapshots.csv
-results/halfcheetah_native_seed_0.json
-```
-
-参数在 `run_halfcheetah_native.py` 顶部：
-
-```python
-TARGET_SPEED = 1.95
-SPEED_TOLERANCE = 0.2
-W_SPEED_ERROR = 4.0
-W_SPEED_TARGET = 2.0
-RESET_LOG_STD = -2.0
-```
-
-我测试过 100K 步：
-
-```text
-mean_upright 约 0.987
-头/躯干接触 0
-mean x velocity 约 1.849 m/s
-目标速度 1.95 m/s
-speed error 约 0.127
-```
-
-原始 HalfCheetah 诊断回报约：
-
-```text
-1593
-```
-
-这个数值接近原来 1M 原生模型的 1616，但**不是同一个奖励目标**；现在仍然保留身体水平、接触和翻滚约束，不能直接当成同一个实验比较。
-
-训练完成后用：
-
-```text
-watch_halfcheetah.py → Run
-```
-
-选择：
-
-```text
-logs/halfcheetah_native/seed_0/final_model.zip
-```
-
-### 12. 最终速度 2.0 m/s
-
-最后从 1.95 m/s 模型继续，把目标速度提高到 `2.0 m/s`。
+最终阶段已完成，目标速度 `2.0 m/s`。历史上是从 1.95 m/s 模型继续训练；中间课程产物现在已经清理。
 
 右键：
 
@@ -816,13 +325,15 @@ logs/halfcheetah_native/seed_0/final_model.zip
 run_halfcheetah_final.py → Run
 ```
 
-它从：
+历史训练使用过的初始化模型：
 
 ```text
 logs/halfcheetah_native/seed_0/final_model.zip
 ```
 
-继续训练，目标速度：
+这个中间模型已经清理；如果重新运行最终脚本，初始模型不存在时会从零开始，因此不适合用来复现已有结果。
+
+目标速度：
 
 ```text
 2.0 m/s
@@ -869,7 +380,7 @@ watch_halfcheetah.py → Run
 logs/halfcheetah_final/seed_0/final_model.zip
 ```
 
-### 13. 补跑最终 2.0 m/s 的 seed 1 和 seed 2
+### 8. 补跑最终 2.0 m/s 的 seed 1 和 seed 2
 
 seed 0 已经训练过，剩下两个 seed 用：
 
@@ -888,13 +399,52 @@ results/halfcheetah_final_seed_2.json
 results/halfcheetah_final_seed_2_snapshots.csv
 ```
 
-注意：当前只有 seed 0 有完整的 1.95 m/s 前一阶段模型，因此 seed 1/2 都从：
+注意：当时只有 seed 0 有完整的 1.95 m/s 前一阶段模型，因此 seed 1/2 都从：
 
 ```text
 logs/halfcheetah_native/seed_0/final_model.zip
 ```
 
 继续训练。训练采样和动作噪声分别使用 seed 1 / seed 2，但初始化模型是共享的，不是完全独立的三个 seed。
+
+这个共享初始化模型现在已经作为中间产物清理，所以该脚本仅保留作记录，重新运行前需要先恢复它。
+
+### 9. 最终三个 seed 的总结
+
+右键：
+
+```text
+summarize_halfcheetah_final_3seeds.py → Run
+```
+
+输出：
+
+```text
+results/halfcheetah_final_3seeds_summary.csv
+results/halfcheetah_final_3seeds_summary.json
+results/halfcheetah_final_3seeds_summary.png
+```
+
+当前三个 final 模型的 10 局测试结果：
+
+```text
+seed 0: 1074.75 ± 989.86
+seed 1: 1508.22 ± 491.94
+seed 2: 1546.45 ± 262.04
+```
+
+三个 seed 的 final mean：`1376.47 ± 262.00`。
+
+注意：seed 0 的均值被 3 个负回报 episode 拉低；如果只看视频里的正常 episode，会感觉它表现不错，但统计上它的方差很大。
+
+图中包含：
+
+```text
+3 个 seed 的训练评测曲线
+3 个 seed 的快照 x velocity
+3 个 seed 的最终 10 局回报分布
+最终快照的速度和 upright
+```
 
 ## 实时观看模型
 
@@ -973,14 +523,6 @@ models/
 较快速度实验的 best_model.zip
 较快速度实验的 snapshots
 较快速度实验的 checkpoints
-1.5 m/s 实验的 final_model.zip
-1.5 m/s 实验的 best_model.zip
-1.5 m/s 实验的 snapshots
-1.5 m/s 实验的 checkpoints
-1.95 m/s 实验的 final_model.zip
-1.95 m/s 实验的 best_model.zip
-1.95 m/s 实验的 snapshots
-1.95 m/s 实验的 checkpoints
 最终 2.0 m/s seed 0 的 final_model.zip
 最终 2.0 m/s seed 0 的 best_model.zip
 最终 2.0 m/s seed 0 的 snapshots

@@ -1,0 +1,63 @@
+{
+  "experiment": "HalfCheetah-v5 final 2.0 m/s",
+  "target_speed": 2.0,
+  "protocol": {
+    "final_eval_episodes": 10,
+    "final_eval_seed": "1000-1009",
+    "model_selection": "final_model",
+    "shared_initialization": "seed 1/2 used seed 0 native 1.95 m/s model as shared initialization"
+  },
+  "seeds": [
+    {
+      "seed": 0,
+      "final_mean": 1074.75,
+      "final_std": 989.86,
+      "final_median": 1684.4,
+      "final_min": -372.71,
+      "final_max": 1702.25,
+      "negative_episodes": 3,
+      "snapshot_speed_mean": 1114.37,
+      "snapshot_x_velocity": 1.2276,
+      "snapshot_upright": 0.8976,
+      "torso_contact_rate": 0.0,
+      "head_contact_rate": 0.0543
+    },
+    {
+      "seed": 1,
+      "final_mean": 1508.22,
+      "final_std": 491.94,
+      "final_median": 1667.59,
+      "final_min": 108.71,
+      "final_max": 1677.38,
+      "negative_episodes": 0,
+      "snapshot_speed_mean": 2100.66,
+      "snapshot_x_velocity": 1.9149,
+      "snapshot_upright": 0.9967,
+      "torso_contact_rate": 0.0,
+      "head_contact_rate": 0.0
+    },
+    {
+      "seed": 2,
+      "final_mean": 1546.45,
+      "final_std": 262.04,
+      "final_median": 1668.29,
+      "final_min": 974.52,
+      "final_max": 1677.93,
+      "negative_episodes": 0,
+      "snapshot_speed_mean": 2022.11,
+      "snapshot_x_velocity": 1.9102,
+      "snapshot_upright": 0.9969,
+      "torso_contact_rate": 0.0,
+      "head_contact_rate": 0.0
+    }
+  ],
+  "aggregate": {
+    "final_mean": 1376.47,
+    "final_std_across_seeds": 262.0,
+    "x_velocity_mean": 1.6842,
+    "upright_mean": 0.9637,
+    "head_contact_mean": 0.0181,
+    "torso_contact_mean": 0.0
+  },
+  "note": "final_mean/final_std include all 10 deterministic test episodes; negative_episodes counts episodes with return below 0."
+}
