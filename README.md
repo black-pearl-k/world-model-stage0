@@ -2,6 +2,8 @@
 
 本仓库包含世界模型学习路径中 Stage 0 的强化学习热身内容。
 
+阶段 0 的逐项验收、PPO 关键概念和 Dreamer 循环说明见 [`STAGE0_ACCEPTANCE.md`](STAGE0_ACCEPTANCE.md)。
+
 ## 实验
 
 | 实验 | 环境 | 状态 |
