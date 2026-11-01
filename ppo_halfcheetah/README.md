@@ -38,6 +38,8 @@ ppo_halfcheetah/
 ├── run_halfcheetah_speed.py       # 从站立模型继续，加一个很小的目标速度
 ├── run_halfcheetah_fast.py        # 从 0.3 m/s 模型继续，把目标提高到 0.8 m/s
 ├── run_halfcheetah_faster.py      # 从 0.8 m/s 模型继续，把目标提高到 1.5 m/s
+├── run_halfcheetah_native.py      # 从 1.5 m/s 模型继续，目标提高到原生约 1.95 m/s
+├── run_halfcheetah_final.py       # 最终速度阶段，目标提高到 2.0 m/s
 ├── plot_halfcheetah_gait_curves.py # 画步态奖励实验曲线
 ├── plot_halfcheetah_stand_curves.py # 画站立实验的奖励和姿态指标
 ├── watch_halfcheetah.py           # 实时打开 MuJoCo 窗口观看模型
@@ -732,6 +734,140 @@ speed error 约 0.097
 logs/halfcheetah_faster/seed_0/final_model.zip
 ```
 
+### 11. 提高到原生模型约 1.95 m/s
+
+最后从 1.5 m/s 模型继续，把目标速度提高到原生模型的前进速度附近。
+
+右键：
+
+```text
+run_halfcheetah_native.py → Run
+```
+
+它从：
+
+```text
+logs/halfcheetah_faster/seed_0/final_model.zip
+```
+
+继续训练，目标速度：
+
+```text
+1.95 m/s
+```
+
+输出：
+
+```text
+logs/halfcheetah_native/seed_0/
+videos/halfcheetah_native/
+results/halfcheetah_native_seed_0_snapshots.csv
+results/halfcheetah_native_seed_0.json
+```
+
+参数在 `run_halfcheetah_native.py` 顶部：
+
+```python
+TARGET_SPEED = 1.95
+SPEED_TOLERANCE = 0.2
+W_SPEED_ERROR = 4.0
+W_SPEED_TARGET = 2.0
+RESET_LOG_STD = -2.0
+```
+
+我测试过 100K 步：
+
+```text
+mean_upright 约 0.987
+头/躯干接触 0
+mean x velocity 约 1.849 m/s
+目标速度 1.95 m/s
+speed error 约 0.127
+```
+
+原始 HalfCheetah 诊断回报约：
+
+```text
+1593
+```
+
+这个数值接近原来 1M 原生模型的 1616，但**不是同一个奖励目标**；现在仍然保留身体水平、接触和翻滚约束，不能直接当成同一个实验比较。
+
+训练完成后用：
+
+```text
+watch_halfcheetah.py → Run
+```
+
+选择：
+
+```text
+logs/halfcheetah_native/seed_0/final_model.zip
+```
+
+### 12. 最终速度 2.0 m/s
+
+最后从 1.95 m/s 模型继续，把目标速度提高到 `2.0 m/s`。
+
+右键：
+
+```text
+run_halfcheetah_final.py → Run
+```
+
+它从：
+
+```text
+logs/halfcheetah_native/seed_0/final_model.zip
+```
+
+继续训练，目标速度：
+
+```text
+2.0 m/s
+```
+
+输出：
+
+```text
+logs/halfcheetah_final/seed_0/
+videos/halfcheetah_final/
+results/halfcheetah_final_seed_0_snapshots.csv
+results/halfcheetah_final_seed_0.json
+```
+
+参数在 `run_halfcheetah_final.py` 顶部：
+
+```python
+TARGET_SPEED = 2.0
+SPEED_TOLERANCE = 0.2
+W_SPEED_ERROR = 4.0
+W_SPEED_TARGET = 2.0
+RESET_LOG_STD = -2.0
+```
+
+我测试过 100K 步：
+
+```text
+mean_upright 约 0.997
+头/躯干接触 0
+mean x velocity 约 2.062 m/s
+目标速度 2.0 m/s
+speed error 约 0.068
+```
+
+训练完成后用：
+
+```text
+watch_halfcheetah.py → Run
+```
+
+选择：
+
+```text
+logs/halfcheetah_final/seed_0/final_model.zip
+```
+
 ## 实时观看模型
 
 右键：
@@ -813,6 +949,14 @@ models/
 1.5 m/s 实验的 best_model.zip
 1.5 m/s 实验的 snapshots
 1.5 m/s 实验的 checkpoints
+1.95 m/s 实验的 final_model.zip
+1.95 m/s 实验的 best_model.zip
+1.95 m/s 实验的 snapshots
+1.95 m/s 实验的 checkpoints
+最终 2.0 m/s 实验的 final_model.zip
+最终 2.0 m/s 实验的 best_model.zip
+最终 2.0 m/s 实验的 snapshots
+最终 2.0 m/s 实验的 checkpoints
 smoke test 模型
 ```
 

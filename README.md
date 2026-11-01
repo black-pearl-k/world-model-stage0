@@ -7,7 +7,7 @@
 | 实验 | 环境 | 状态 |
 |---|---|---|
 | `ppo_cartpole/` | CartPole-v1 | 已完成：3 个 seed，500 ± 0 |
-| `ppo_halfcheetah/` | HalfCheetah-v5 | 已完成 300K 3 seeds；步态/站立/0.3/0.8/1.5 m/s 实验代码已就绪 |
+| `ppo_halfcheetah/` | HalfCheetah-v5 | 已完成 300K 3 seeds；步态/站立/0.3/0.8/1.5/1.95/2.0 m/s 实验代码已就绪 |
 
 ## 当前结果
 
@@ -44,6 +44,8 @@ ppo_halfcheetah/run_halfcheetah_stand.py
 ppo_halfcheetah/run_halfcheetah_speed.py
 ppo_halfcheetah/run_halfcheetah_fast.py
 ppo_halfcheetah/run_halfcheetah_faster.py
+ppo_halfcheetah/run_halfcheetah_native.py
+ppo_halfcheetah/run_halfcheetah_final.py
 ```
 
 `run_halfcheetah_stand.py` 使用 `StandRewardWrapper`，完全去掉原始前进奖励，先让模型学会身体水平、腿在下面、不用头/背滑行。
@@ -53,6 +55,10 @@ ppo_halfcheetah/run_halfcheetah_faster.py
 速度稳定后用 `run_halfcheetah_fast.py` 从 0.3 m/s 模型继续，把目标提高到 `0.8 m/s`。
 
 再用 `run_halfcheetah_faster.py` 从 0.8 m/s 模型继续，把目标提高到 `1.5 m/s`。
+
+最后用 `run_halfcheetah_native.py` 从 1.5 m/s 模型继续，把目标提高到约 `1.95 m/s`。
+
+最终用 `run_halfcheetah_final.py` 从 1.95 m/s 模型继续，把目标提高到 `2.0 m/s`。
 
 运行方式、奖励公式和调参规则见 [`ppo_halfcheetah/README.md`](ppo_halfcheetah/README.md)。
 
