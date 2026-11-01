@@ -32,7 +32,6 @@ ppo_halfcheetah/
 ├── train.py                       # PPO 训练函数，也可单独运行
 ├── run_halfcheetah_smoke.py       # 2 万步 smoke test
 ├── run_halfcheetah_3seeds.py      # 一键训练 3 个 seed
-├── run_halfcheetah_1m.py          # seed 0 训练 1M 步，并保存过程视频
 ├── reward_wrappers.py             # 奖励塑形：步态版 + 只站立版
 ├── run_halfcheetah_gait.py        # seed 0 步态奖励训练，保存过程视频和步态统计
 ├── run_halfcheetah_stand.py       # seed 0 只站立训练，先去掉前进奖励
@@ -42,9 +41,7 @@ ppo_halfcheetah/
 ├── eval.py                        # 评测函数，不做训练
 ├── run_eval_halfcheetah.py        # 评测 3 个模型并生成结果表、视频
 ├── plot_halfcheetah_curves.py     # 画 3 个 seed 的评测曲线
-├── plot_halfcheetah_1m_curves.py  # 画 1M seed 0 的评测曲线
 ├── run_tensorboard.py             # 在 PyCharm 内启动 300K TensorBoard
-├── run_tensorboard_1m.py          # 在 PyCharm 内启动 1M TensorBoard
 ├── run_tensorboard_gait.py        # 在 PyCharm 内启动步态奖励 TensorBoard
 ├── run_tensorboard_stand.py       # 在 PyCharm 内启动站立实验 TensorBoard
 ├── logs/                          # 训练日志、TensorBoard、evaluations.npz
@@ -131,76 +128,7 @@ STEPS = 500_000
 
 然后 3 个 seed 一起重跑。不要不同 seed 用不同步数。
 
-### 3. 单独跑 seed 0 到 1M 步
-
-右键：
-
-```text
-run_halfcheetah_1m.py → Run
-```
-
-它会：
-
-```text
-只训练 seed 0
-训练 1,000,000 步
-PPO 超参和 300K baseline 完全一致
-不覆盖原来的 logs/halfcheetah/seed_0/
-```
-
-输出目录：
-
-```text
-logs/halfcheetah_1m/seed_0/
-videos/halfcheetah_1m/
-results/halfcheetah_1m_seed_0.json
-results/halfcheetah_1m_snapshots.csv
-```
-
-在以下步数各保存一次视频、截图、模型和回报：
-
-```text
-0
-250K
-500K
-750K
-1M
-```
-
-每个视频只录前 300 帧，约 10 秒。  
-每个节点跑 3 局，CSV 里记录平均回报和标准差。  
-最后再用 `seed 1000–1009` 跑 10 局最终评测，和原来的 seed 0 结果对比。
-
-预计时间：20～40 分钟，取决于 CPU 和视频编码速度。
-
-训练完成后，右键：
-
-```text
-plot_halfcheetah_1m_curves.py → Run
-```
-
-会生成：
-
-```text
-results/halfcheetah_1m_curve.png
-```
-
-图里会同时画：
-
-- 300K seed 0 的验证曲线；
-- 1M seed 0 的验证曲线；
-- 1M 验证最高点；
-- 最终 10 局测试均值参考线。
-
-数据来源：
-
-```text
-logs/halfcheetah_1m/seed_0/evaluations.npz  # 每 25K 步的验证曲线
-results/halfcheetah_1m_snapshots.csv        # 0/250K/500K/750K/1M 五个视频节点
-logs/halfcheetah_1m/seed_0/monitor.csv      # 每个训练 episode 的回报
-```
-
-### 4. 看 TensorBoard
+### 3. 看 TensorBoard
 
 右键：
 
@@ -212,13 +140,6 @@ run_tensorboard.py → Run
 
 ```text
 http://localhost:6007
-```
-
-1M 实验用另一个端口：
-
-```text
-run_tensorboard_1m.py → Run
-http://localhost:6008
 ```
 
 重点看：
@@ -233,7 +154,7 @@ train/value_loss
 
 看完后，在 PyCharm 的 Run 控制台按 Enter，停止 TensorBoard。
 
-### 5. 评测 3 个模型
+### 4. 评测 3 个模型
 
 右键：
 
@@ -264,7 +185,7 @@ videos/halfcheetah_seed_0.png
 
 视频只录前 300 帧，避免文件太大。
 
-### 6. 画曲线
+### 5. 画曲线
 
 右键：
 
@@ -280,9 +201,9 @@ results/halfcheetah_curves.png
 
 曲线来自训练中 `EvalCallback` 的 `evaluations.npz`，不是最终评测。
 
-### 7. 奖励塑形实验（解决头朝地）
+### 6. 奖励塑形实验（解决头朝地）
 
-1M 实验仍然会头朝地，原因是原始 HalfCheetah 奖励只奖励前进速度，
+原生奖励训练出来的模型会头朝地，原因是原始 HalfCheetah 奖励只奖励前进速度，
 不奖励“身体正、用腿跑”。继续增加训练步数不会解决这个问题，需要改奖励。
 
 右键：
@@ -367,7 +288,7 @@ original_mean      原始 HalfCheetah 奖励
 shaped_mean        塑形奖励
 ```
 
-注意：`shaped_mean` 和原来的 976 / 1616 不是同一个尺度，不能直接比较。
+注意：`shaped_mean` 和原来的 976 不是同一个尺度，不能直接比较。
 最终 JSON 里的 `mean` 是用**没有 wrapper 的环境**重新评测的原始回报。
 训练中的 `best_model` 是按塑形验证奖励选出的，不是按原始奖励选出的；这样更符合“先让姿势正常”的目标。
 
@@ -392,11 +313,9 @@ run_tensorboard_gait.py → Run
 http://localhost:6009
 ```
 
-先只跑 seed 0 的 300K，确认视频里不再用头/背滑行，再考虑 3 个 seed 或 1M。
+先只跑 seed 0 的 300K，确认视频里不再用头/背滑行，再考虑 3 个 seed。
 
-如果以后把 `STEPS` 改成 `1_000_000`，建议同时把 `SNAPSHOT_INTERVAL` 改成 `100_000`，避免产生 19 个中间视频。
-
-### 8. 先练习站立（完全去掉前进奖励）
+### 7. 先练习站立（完全去掉前进奖励）
 
 上一版步态奖励仍然保留了原始前进奖励，所以模型还是会为了速度往前跑，并且可能翻跟头。
 
@@ -487,7 +406,7 @@ head_contact_rate  是否接近 0
 mean_x_velocity    是否接近 0
 ```
 
-最终 JSON 里的原始 HalfCheetah 回报会接近 0 或为负，这是正常的，因为现在根本没有奖励前进。不要拿它和 976 / 1616 比较。
+最终 JSON 里的原始 HalfCheetah 回报会接近 0 或为负，这是正常的，因为现在根本没有奖励前进。不要拿它和 976 比较。
 
 训练完成后，运行 `watch_halfcheetah.py`，选择：
 
@@ -588,16 +507,16 @@ models/
 下面的所有 `.zip` 模型，并按修改时间从新到旧列出，例如：
 
 ```text
-[ 1] 2026-10-31 23:17  165.4 KB  logs\halfcheetah_1m\seed_0\snapshots\model_1000000.zip
-[ 2] 2026-10-31 23:17  165.4 KB  logs\halfcheetah_1m\seed_0\final_model.zip
-[ 3] 2026-10-31 23:15  165.4 KB  logs\halfcheetah_1m\seed_0\best_model\best_model.zip
+[ 1] 2026-11-01 00:21  165.4 KB  logs\halfcheetah_gait\seed_0\final_model.zip
+[ 2] 2026-11-01 00:16  165.4 KB  logs\halfcheetah_gait\seed_0\best_model\best_model.zip
+[ 3] 2026-10-31 21:41  165.4 KB  logs\halfcheetah\seed_0\final_model.zip
 ...
 ```
 
 然后输入编号选择：
 
 ```text
-输入模型编号 1-65（直接回车=1，q=退出）:
+输入模型编号（直接回车=1，q=退出）:
 ```
 
 - 输入数字：加载对应模型；
@@ -610,10 +529,6 @@ models/
 300K 的 final_model.zip
 300K 的 best_model.zip
 300K 的 checkpoints
-1M 的 final_model.zip
-1M 的 best_model.zip
-1M 的 snapshots
-1M 的 checkpoints
 步态奖励实验的 final_model.zip
 步态奖励实验的 best_model.zip
 步态奖励实验的 snapshots
@@ -662,19 +577,6 @@ seed 0: 976.48
 seed 1: 1228.87
 seed 2: 879.20
 Mean ± Std: 1028.18 ± 180.48
-```
-
-1M，seed 0，最终评测 10 局（同样的 seed 1000–1009）：
-
-```text
-mean ± std: 1616.10 ± 37.86
-best validation eval: 1625.20 @ 900K
-```
-
-1M 曲线：
-
-```text
-results/halfcheetah_1m_curve.png
 ```
 
 ## 结果记录模板

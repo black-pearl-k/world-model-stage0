@@ -1,6 +1,0 @@
-step,mean_return,std_return,mean_length,video,model
-0,0.11,0.98,1000.0,D:\world_model\stage_0\ppo_halfcheetah\videos\halfcheetah_1m\halfcheetah_1m_0000000.mp4,D:\world_model\stage_0\ppo_halfcheetah\logs\halfcheetah_1m\seed_0\snapshots\model_0000000.zip
-250000,815.34,106.15,1000.0,D:\world_model\stage_0\ppo_halfcheetah\videos\halfcheetah_1m\halfcheetah_1m_0250000.mp4,D:\world_model\stage_0\ppo_halfcheetah\logs\halfcheetah_1m\seed_0\snapshots\model_0250000.zip
-500000,1552.15,26.79,1000.0,D:\world_model\stage_0\ppo_halfcheetah\videos\halfcheetah_1m\halfcheetah_1m_0500000.mp4,D:\world_model\stage_0\ppo_halfcheetah\logs\halfcheetah_1m\seed_0\snapshots\model_0500000.zip
-750000,1617.71,18.07,1000.0,D:\world_model\stage_0\ppo_halfcheetah\videos\halfcheetah_1m\halfcheetah_1m_0750000.mp4,D:\world_model\stage_0\ppo_halfcheetah\logs\halfcheetah_1m\seed_0\snapshots\model_0750000.zip
-1000000,1654.87,26.9,1000.0,D:\world_model\stage_0\ppo_halfcheetah\videos\halfcheetah_1m\halfcheetah_1m_1000000.mp4,D:\world_model\stage_0\ppo_halfcheetah\logs\halfcheetah_1m\seed_0\snapshots\model_1000000.zip

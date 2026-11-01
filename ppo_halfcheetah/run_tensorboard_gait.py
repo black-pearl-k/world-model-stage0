@@ -13,7 +13,7 @@ import webbrowser  # 自动打开浏览器
 
 from train import PROJECT_DIR  # 项目目录
 
-PORT = 6009  # 和 300K 的 6007、1M 的 6008 区分开
+PORT = 6009  # 和 300K 的 6007、站立实验的 6010 区分开
 
 
 def main() -> None:

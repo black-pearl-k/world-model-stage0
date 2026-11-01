@@ -2,14 +2,14 @@
 
 在 PyCharm 里右键这个文件 -> Run，不需要终端参数。
 
-这个脚本不会覆盖原来的 300K baseline 或 1M 实验，输出到：
+这个脚本不会覆盖原来的 300K baseline，输出到：
     logs/halfcheetah_gait/seed_0/
     videos/halfcheetah_gait/
     results/halfcheetah_gait_seed_0.json
     results/halfcheetah_gait_seed_0_snapshots.csv
 
 第一阶段建议先跑 300K，只看 seed 0。每 50K 保存一次视频、截图、模型和
-步态统计。确认姿势正常后，再考虑跑 3 个 seed 或 1M。
+步态统计。确认姿势正常后，再考虑跑 3 个 seed。
 
 重要：
     - 训练时用带奖励塑形的环境；
@@ -42,7 +42,7 @@ from train import PROJECT_DIR  # 项目目录
 
 ENV_ID = "HalfCheetah-v5"  # 环境名
 SEED = 0  # 先只跑 seed 0
-STEPS = 300_000  # 第一轮先跑 300K，不要直接上 1M
+STEPS = 300_000  # 第一轮先跑 300K
 
 # 这些 PPO 超参和原 baseline 保持一致，方便单独观察奖励塑形的影响。
 N_STEPS = 2048  # 每次采样 2048 步

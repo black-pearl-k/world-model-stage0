@@ -20,7 +20,7 @@
 注意：
     - 这个阶段不是跑步实验；
     - 最终原始 HalfCheetah 回报会很低，这是正常的，因为现在不奖励跑；
-    - 最终 JSON 里的 mean 只是诊断值，不要和 976 / 1616 比较。
+    - 最终 JSON 里的 mean 只是诊断值，不要和 976 比较。
 """
 
 from __future__ import annotations  # 让类型注解延迟求值
@@ -483,7 +483,7 @@ def main() -> None:
     train_env.close()
     eval_env.close()
 
-    # 这个原始奖励评测只用于诊断，不应该拿来和 976 / 1616 比较。
+    # 这个原始奖励评测只用于诊断，不应该拿来和 976 比较。
     print(f"\nRunning final {FINAL_EVAL_EPISODES}-episode original-reward diagnostic ...")
     final_result = evaluate_model(
         model_path=LOG_DIR / "final_model.zip",
