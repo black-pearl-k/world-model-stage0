@@ -7,7 +7,7 @@
 | 实验 | 环境 | 状态 |
 |---|---|---|
 | `ppo_cartpole/` | CartPole-v1 | 已完成：3 个 seed，500 ± 0 |
-| `ppo_halfcheetah/` | HalfCheetah-v5 | 已完成 300K 3 seeds；1M seed 0 实验脚本已就绪 |
+| `ppo_halfcheetah/` | HalfCheetah-v5 | 已完成 300K 3 seeds 和 1M seed 0；奖励塑形实验代码已就绪 |
 
 ## 当前结果
 
@@ -33,7 +33,32 @@ seed_2: 879.20
 mean ± std: 1028.18 ± 180.48
 ```
 
-HalfCheetah 的 300K 结果和“倒着滑”的奖励漏洞分析见 [`ppo_halfcheetah/README.md`](ppo_halfcheetah/README.md)。1M seed 0 实验运行 `ppo_halfcheetah/run_halfcheetah_1m.py`。
+HalfCheetah 的 300K 结果和“倒着滑”的奖励漏洞分析见 [`ppo_halfcheetah/README.md`](ppo_halfcheetah/README.md)。
+
+1M seed 0 最终评测（同样使用 seed 1000–1009，10 局）：
+
+```text
+mean ± std: 1616.10 ± 37.86
+```
+
+1M 实验运行 `ppo_halfcheetah/run_halfcheetah_1m.py`，曲线见 `ppo_halfcheetah/results/halfcheetah_1m_curve.png`。
+
+1M 模型仍然会头朝地滑行，说明继续增加训练步数不能解决奖励漏洞。下一步用奖励塑形让模型保持身体水平、避免躯干/头碰地，再重新训练。相关代码：
+
+```text
+ppo_halfcheetah/reward_wrappers.py
+ppo_halfcheetah/run_halfcheetah_gait.py
+```
+
+现在又增加了“先站立、不跑步”的第一阶段：
+
+```text
+ppo_halfcheetah/run_halfcheetah_stand.py
+```
+
+它使用 `StandRewardWrapper`，完全去掉原始前进奖励，先让模型学会身体水平、腿在下面、不用头/背滑行。
+
+运行方式、奖励公式和调参规则见 [`ppo_halfcheetah/README.md`](ppo_halfcheetah/README.md)。
 
 ## 环境
 

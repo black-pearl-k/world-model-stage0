@@ -1,0 +1,60 @@
+{
+  "env": "HalfCheetah-v5",
+  "model": "D:\\world_model\\stage_0\\ppo_halfcheetah\\logs\\halfcheetah_gait\\seed_0\\final_model.zip",
+  "episodes": [
+    1121.6832350520515,
+    872.2345853020886,
+    -379.64684904995545,
+    333.83908887813624,
+    202.8762394158417,
+    647.0081729573081,
+    102.26874690275008,
+    656.7605436707236,
+    331.4670331732841,
+    404.7808777419807
+  ],
+  "lengths": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ],
+  "mean": 429.32716740442095,
+  "std": 422.5081403437372,
+  "video": "D:\\world_model\\stage_0\\ppo_halfcheetah\\videos\\halfcheetah_gait\\halfcheetah_gait_final_eval.mp4",
+  "screenshot": "D:\\world_model\\stage_0\\ppo_halfcheetah\\videos\\halfcheetah_gait\\halfcheetah_gait_final_eval.png",
+  "train_seed": 0,
+  "steps": 300000,
+  "reward_config": {
+    "w_upright": 0.5,
+    "w_body_contact": 1.0,
+    "w_height": 0.3,
+    "height_tolerance": 0.15,
+    "target_speed": null,
+    "w_speed_over": 1.0
+  },
+  "final_snapshot": {
+    "step": 300000,
+    "shaped_mean": 751.47,
+    "shaped_std": 1150.79,
+    "original_mean": 538.09,
+    "original_std": 804.51,
+    "mean_length": 1000.0,
+    "mean_rooty": -1.2977,
+    "mean_upright": 0.5109,
+    "mean_rootz": -0.0378,
+    "body_contact_rate": 0.0293,
+    "mean_x_velocity": 0.8215,
+    "video": "D:\\world_model\\stage_0\\ppo_halfcheetah\\videos\\halfcheetah_gait\\halfcheetah_gait_0300000.mp4",
+    "screenshot": "D:\\world_model\\stage_0\\ppo_halfcheetah\\videos\\halfcheetah_gait\\halfcheetah_gait_0300000.png",
+    "model": "D:\\world_model\\stage_0\\ppo_halfcheetah\\logs\\halfcheetah_gait\\seed_0\\snapshots\\gait_0300000.zip"
+  },
+  "snapshot_csv": "D:\\world_model\\stage_0\\ppo_halfcheetah\\results\\halfcheetah_gait_seed_0_snapshots.csv",
+  "note": "final mean/std is evaluated on the original HalfCheetah reward; final_snapshot contains shaped and original snapshot metrics."
+}
