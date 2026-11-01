@@ -37,6 +37,7 @@ ppo_halfcheetah/
 ├── run_halfcheetah_stand.py       # seed 0 只站立训练，先去掉前进奖励
 ├── run_halfcheetah_speed.py       # 从站立模型继续，加一个很小的目标速度
 ├── run_halfcheetah_fast.py        # 从 0.3 m/s 模型继续，把目标提高到 0.8 m/s
+├── run_halfcheetah_faster.py      # 从 0.8 m/s 模型继续，把目标提高到 1.5 m/s
 ├── plot_halfcheetah_gait_curves.py # 画步态奖励实验曲线
 ├── plot_halfcheetah_stand_curves.py # 画站立实验的奖励和姿态指标
 ├── watch_halfcheetah.py           # 实时打开 MuJoCo 窗口观看模型
@@ -672,6 +673,65 @@ W_ROOT_VELOCITY
 
 如果它太慢，继续提高 `TARGET_SPEED`；不要一次从 0.8 跳到 1.8。
 
+### 10. 把目标速度提高到 1.5 m/s
+
+在 0.8 m/s 模型稳定之后，再提高速度。
+
+右键：
+
+```text
+run_halfcheetah_faster.py → Run
+```
+
+它从：
+
+```text
+logs/halfcheetah_fast/seed_0/final_model.zip
+```
+
+继续训练，目标速度改为：
+
+```text
+1.5 m/s
+```
+
+输出：
+
+```text
+logs/halfcheetah_faster/seed_0/
+videos/halfcheetah_faster/
+results/halfcheetah_faster_seed_0_snapshots.csv
+results/halfcheetah_faster_seed_0.json
+```
+
+参数在 `run_halfcheetah_faster.py` 顶部：
+
+```python
+TARGET_SPEED = 1.5
+SPEED_TOLERANCE = 0.15
+W_SPEED_ERROR = 4.0
+W_SPEED_TARGET = 2.0
+RESET_LOG_STD = -2.3
+```
+
+我测试过 100K 步：
+
+```text
+mean_upright 约 0.995
+头/躯干接触 0
+mean x velocity 约 1.359 m/s
+目标速度 1.5 m/s
+speed error 约 0.097
+```
+
+说明它已经能在保持水平的情况下，以大约 `1.36 m/s` 前进。
+
+训练完成后用 `watch_halfcheetah.py` 选择：
+
+```text
+logs/halfcheetah_faster/seed_0/final_model.zip
+```
+
 ## 实时观看模型
 
 右键：
@@ -749,6 +809,10 @@ models/
 较快速度实验的 best_model.zip
 较快速度实验的 snapshots
 较快速度实验的 checkpoints
+1.5 m/s 实验的 final_model.zip
+1.5 m/s 实验的 best_model.zip
+1.5 m/s 实验的 snapshots
+1.5 m/s 实验的 checkpoints
 smoke test 模型
 ```
 
